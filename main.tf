@@ -89,9 +89,9 @@ resource "aws_lambda_function" "lambda_ms_simple" {
 
 # log group to store log messages from your lambda for 2 days
 
-resource "aws_cloudwatch_log_group" "ec_random_notes" {
+resource "aws_cloudwatch_log_group" "lambda_ms_simple" {
   name              = "/aws/lambda/${aws_lambda_function.lambda_ms_simple.function_name}"
-  retention_in_days = 2
+  retention_in_days = 1
 }
 
 # IAM role that allows Lambda to access resources in your AWS account
@@ -124,7 +124,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 #########################################
 # defines a name for the API Gateway and sets its protocol to HTTP.
 resource "aws_apigatewayv2_api" "lambda" {
-  name          = "serverless_lambda_gw"
+  name          = "ms_simple_lambda_gateway"
   protocol_type = "HTTP"
 }
 
@@ -155,7 +155,7 @@ resource "aws_apigatewayv2_stage" "lambda" {
 }
 
 # configures the API Gateway to use your Lambda function.
-resource "aws_apigatewayv2_integration" "ec_random_notes" {
+resource "aws_apigatewayv2_integration" "ms_simple_gtwy_integration" {
   api_id = aws_apigatewayv2_api.lambda.id
 
   integration_uri    = aws_lambda_function.lambda_ms_simple.invoke_arn
@@ -164,11 +164,11 @@ resource "aws_apigatewayv2_integration" "ec_random_notes" {
 }
 
 # maps an HTTP request to a target, in
-resource "aws_apigatewayv2_route" "ec_random_notes" {
+resource "aws_apigatewayv2_route" "ms_simple_gtwy_routing" {
   api_id = aws_apigatewayv2_api.lambda.id
 
   route_key = "GET /notes"
-  target    = "integrations/${aws_apigatewayv2_integration.ec_random_notes.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.ms_simple_gtwy_integration.id}"
 }
 
 #  log group to store access logs f
@@ -179,7 +179,7 @@ resource "aws_cloudwatch_log_group" "api_gw" {
 }
 
 # API Gateway permission to invoke your Lambda function.
-resource "aws_lambda_permission" "api_gw_random_notes" {
+resource "aws_lambda_permission" "api_gw_simple_ms_lambda" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_ms_simple.function_name
@@ -199,7 +199,7 @@ output "lambda_bucket_name" {
 output "function_name" {
   description = "Name of the EC notes random Lambda function."
 
-  value = aws_lambda_function.ec_notes_random_notes.function_name
+  value = aws_lambda_function.lambda_ms_simple.function_name
 }
 
 output "base_url_random_quote" {
