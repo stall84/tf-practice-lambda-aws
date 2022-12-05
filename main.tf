@@ -208,6 +208,6 @@ output "base_url_random_quote" {
 }
 
 output "base_url_today_date" {
-  description = "today-date"
-  value       = "curl ${aws_apigatewayv2_stage.lambda.invoke_url}/notes?action=today-date"
+  description = "todays-date"
+  value       = "curl ${aws_apigatewayv2_stage.lambda.invoke_url}/notes?action=todays-date"
 }
